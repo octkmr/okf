@@ -2,18 +2,18 @@
 
 OKF（Open Knowledge Format）を採用した、ドキュメントを残すためのフレームワークを提供する抽象リポジトリ。
 
-このリポジトリをテンプレートにして、具体的なナレッジベースを構築する。
+このリポジトリをテンプレートにして、具体的なナレッジベースを構築する。リポジトリは1つで、その下に関心事ごとのvaultを並べる。
 
 # ドキュメントの書き方について
 
-編集は基本Obsidianで行う。`docs/`をvaultとして開き、概念ごとに1ファイル作る。テンプレートは`docs/_templates/OKF.md`にある。
+編集は基本Obsidianで行う。関心事ごとのディレクトリをvaultとして開き、その中に概念ごとに1ファイル作る。テンプレートは各vaultの`_templates/OKF.md`にある。
 
 新規ノートを作るとTemplaterがテンプレートを適用し、created、updatedが埋まる。type、description、tagsは自分で書く。updatedは保存のたびにUpdate time on editが書き換える。
 
 # 使用ツール
 
 - Obsidian
-  - docs以下をvaultとして開く。（docsは導入方法のセクションにある通り、リネームする前提）
+  - 関心事ごとのディレクトリをvaultとして開く。（テンプレートの`docs`は導入方法のとおりリネームする前提）
   - プラグインは`.obsidian/plugins/`ごとリポジトリに入っているので、インストールは要らない。初回だけRestricted modeをオフにする。
   - Templater。新規ノートに`_templates/OKF.md`を当てて、created、updatedを埋める。
   - Update time on edit。保存のたびにupdatedを書き換える。
@@ -22,6 +22,7 @@ OKF（Open Knowledge Format）を採用した、ドキュメントを残すた�
 - Claude Code
   - 必須ではないが、あると便利。
   - CLAUDE.mdはテンプレートに置いていない。作り方は「導入方法」の6にある。
+  - 書き方のルールは`.claude/rules/`に置く。リポジトリのルートなので全vault共通になる。
 
 # 導入方法
 
@@ -35,13 +36,13 @@ gh repo create my-knowledge-base --template octkmr/okf --private --clone
 
 フォークは使わない。理由は「フォークではなくテンプレートを使う理由」に書いた。
 
-## 2. docsをナレッジベースの名前にリネームする
+## 2. docsを関心事の名前にリネームする
 
 ```bash
-git mv docs okf-personal
+git mv docs it
 ```
 
-※Obsidianのvault名はフォルダ名がそのまま表示される。`docs`のままだと、複数のナレッジベースを開いたときにvault一覧で区別がつかないのでリネームしている。
+※Obsidianのvault名はフォルダ名がそのまま表示される。`docs`のままだと、複数のvaultを開いたときに一覧で区別がつかないのでリネームしている。
 
 ## 3. Obsidianで開いてプラグインを有効にする
 
@@ -69,6 +70,23 @@ README.mdの冒頭にある「このリポジトリについて」を、その�
 ## 6. （任意）必要ならCLAUDE.mdを作成する
 
 claude codeから`/init`し、調整する。
+
+## 関心事を増やす
+
+vaultは関心事ごとに1つ作る。ITと仕事なら`it/`と`work/`が並び、それぞれが`.obsidian/`、`_templates/`、`TIMELINE.base`を持つ。
+
+既存のvaultをコピーするのが早い。
+
+```bash
+cp -r it work
+git add work && git commit -m "work vaultを追加"
+```
+
+ノートが入っていれば消す。設定とテンプレートとTIMELINE.baseはそのまま使える。
+
+コピーなので、プラグイン本体672KBと`.obsidian/`と`_templates/`がvaultの数だけ増える。Templaterの設定やOKF.mdを変えたときは、全vaultに手で反映することになる。2つ3つなら問題ないが、増やすほど反映漏れが起きやすくなる。
+
+vaultをまたぐリンクとバックリンクは繋がらない。検索もTIMELINE.baseもvaultの中で閉じる。関心事が交わるなら、分けずに1つのvaultの中でディレクトリを切ったほうがいい。
 
 ## テンプレート側の更新を取り込む
 
