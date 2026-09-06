@@ -1,0 +1,14 @@
+{
+  "dateFormat": "yyyy-MM-dd",
+  "enableCreateTime": true,
+  "headerUpdated": "updated",
+  "headerCreated": "created",
+  "minMinutesBetweenSaves": 1,
+  "ignoreGlobalFolder": [],
+  "ignoreCreatedFolder": [],
+  "enableExperimentalHash": false,
+  "fileHashMap": {
+    "テスト.md": "1b608a441604bb21c3c4004a50fc6135242f8a4e2203e80c081beb0b90311436",
+    "_templates/OKF.md": "7b88433439840a5f2c21878a8ad2e480e117816e8ec3040add0ee09cb6885be2"
+  }
+}

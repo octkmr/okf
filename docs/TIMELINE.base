@@ -1,0 +1,16 @@
+views:
+  - type: table
+    name: 表
+    filters:
+      and:
+        - file.name != "TIMELINE.base"
+        - file.folder != "_templates"
+    order:
+      - file.name
+      - description
+      - type
+      - created
+      - updated
+    sort:
+      - property: updated
+        direction: DESC
