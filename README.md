@@ -2,7 +2,7 @@
 
 OKF（Open Knowledge Format）を採用した、ドキュメントを残すためのフレームワークを提供する抽象リポジトリ。
 
-このリポジトリをテンプレートにして、具体的なナレッジベースを構築する。リポジトリは1つで、その下に関心事ごとのvaultを並べる。
+このリポジトリをテンプレートにして、具体的なナレッジベースを構築する。リポジトリは1つで、その下に関心事ごとのvaultを並べる。`docs/`はvaultではなく、コピー元としてそのまま残す。
 
 # ドキュメントの書き方について
 
@@ -13,7 +13,7 @@ OKF（Open Knowledge Format）を採用した、ドキュメントを残すた�
 # 使用ツール
 
 - Obsidian
-  - 関心事ごとのディレクトリをvaultとして開く。（テンプレートの`docs`は導入方法のとおりリネームする前提）
+  - 関心事ごとのディレクトリをvaultとして開く。`docs/`はコピー元なので開かない。
   - プラグインは`.obsidian/plugins/`ごとリポジトリに入っているので、インストールは要らない。初回だけRestricted modeをオフにする。
   - Templater。新規ノートに`_templates/OKF.md`を当てて、created、updatedを埋める。
   - Update time on edit。保存のたびにupdatedを書き換える。
@@ -36,17 +36,22 @@ gh repo create my-knowledge-base --template octkmr/okf --private --clone
 
 フォークは使わない。理由は「フォークではなくテンプレートを使う理由」に書いた。
 
-## 2. docsを関心事の名前にリネームする
+## 2. docsをコピーして最初のvaultを作る
+
+関心事の名前でコピーする。
 
 ```bash
-git mv docs it
+cp -r docs it
+git add it && git commit -m "it vaultを追加"
 ```
 
-※Obsidianのvault名はフォルダ名がそのまま表示される。`docs`のままだと、複数のvaultを開いたときに一覧で区別がつかないのでリネームしている。
+`docs/`は消さずに残す。以降のvaultも全部ここからコピーするし、リネームしないのでokf側の更新が素直にマージできる。
+
+※Obsidianのvault名はフォルダ名がそのまま表示される。`docs`のまま使うと一覧で区別がつかないので、コピー先に関心事の名前をつけている。
 
 ## 3. Obsidianで開いてプラグインを有効にする
 
-「Open folder as vault」で、2でリネームしたディレクトリを選ぶ。リポジトリのルートを選ぶとREADME.mdもノートとして扱われるので、選ぶのはナレッジベースのディレクトリだけにする。
+「Open folder as vault」で、2でコピーしたディレクトリを選ぶ。リポジトリのルートを選ぶとREADME.mdもノートとして扱われるので、選ぶのはナレッジベースのディレクトリだけにする。
 
 プラグイン2つは`.obsidian/plugins/`ごとリポジトリに入っているので、インストールは要らない。初回だけSettings > Community pluginsでRestricted modeをオフにする。オフにするまでプラグインは読み込まれず、frontmatterは何も埋まらない。
 
@@ -65,7 +70,7 @@ Obsidianで新規ノートを作り、概念の名前をファイル名にする
 
 ## 5. リポジトリの説明を自分のナレッジベースのものに置き換える
 
-README.mdの冒頭にある「このリポジトリについて」を、そのナレッジベースが何を扱うのかの説明に書き換える。あわせて、残っている`docs/`を2でつけた名前に直す。テンプレートの説明のまま残すと、後から来た人がどちらのリポジトリを読んでいるのかわからなくなる。
+README.mdの冒頭にある「このリポジトリについて」を、そのナレッジベースが何を扱うのかの説明に書き換える。テンプレートの説明のまま残すと、後から来た人がどちらのリポジトリを読んでいるのかわからなくなる。
 
 ## 6. （任意）必要ならCLAUDE.mdを作成する
 
@@ -75,14 +80,14 @@ claude codeから`/init`し、調整する。
 
 vaultは関心事ごとに1つ作る。ITと仕事なら`it/`と`work/`が並び、それぞれが`.obsidian/`、`_templates/`、`TIMELINE.base`を持つ。
 
-既存のvaultをコピーするのが早い。
+手順2と同じく`docs/`からコピーする。
 
 ```bash
-cp -r it work
+cp -r docs work
 git add work && git commit -m "work vaultを追加"
 ```
 
-ノートが入っていれば消す。設定とテンプレートとTIMELINE.baseはそのまま使える。
+既存のvaultからコピーすると、そのvaultのノートやworkspace.jsonまで付いてくる。コピー元は常に`docs/`にする。
 
 コピーなので、プラグイン本体672KBと`.obsidian/`と`_templates/`がvaultの数だけ増える。Templaterの設定やOKF.mdを変えたときは、全vaultに手で反映することになる。2つ3つなら問題ないが、増やすほど反映漏れが起きやすくなる。
 
@@ -98,4 +103,6 @@ git fetch upstream
 git merge upstream/main --allow-unrelated-histories
 ```
 
-履歴が繋がっていないので、初回だけ--allow-unrelated-historiesが要る。docsをリネームしているので、テンプレート側でdocs/以下を変更しているとコンフリクトする。
+履歴が繋がっていないので、初回だけ--allow-unrelated-historiesが要る。2回目以降は`git fetch upstream`と`git merge upstream/main`だけでいい。
+
+`docs/`をリネームしていないので、テンプレート側の変更はそのままマージされる。ただし反映されるのは`docs/`だけで、コピー済みのvaultには届かない。OKF.mdやプラグイン設定が変わったときは、`docs/`から各vaultへ手で移す。
