@@ -34,15 +34,13 @@ GitHubの画面で「Use this template」を押すか、CLIなら次を実行す
 gh repo create my-knowledge-base --template octkmr/okf --private --clone
 ```
 
-フォークは使わない。理由は「フォークではなくテンプレートを使う理由」に書いた。
-
 ## 2. docsをコピーして最初のvaultを作る
 
 関心事の名前でコピーする。
 
 ```bash
-cp -r docs it
-git add it && git commit -m "it vaultを追加"
+scripts/new-vault.sh it
+git commit -m "it vaultを追加"
 ```
 
 `docs/`は消さずに残す。以降のvaultも全部ここからコピーするし、リネームしないのでokf側の更新が素直にマージできる。
@@ -80,14 +78,15 @@ claude codeから`/init`し、調整する。
 
 vaultは関心事ごとに1つ作る。ITと仕事なら`it/`と`work/`が並び、それぞれが`.obsidian/`、`_templates/`、`TIMELINE.base`を持つ。
 
-手順2と同じく`docs/`からコピーする。
+`docs/`からコピーする。スクリプトを用意してある。
 
 ```bash
-cp -r docs work
-git add work && git commit -m "work vaultを追加"
+scripts/new-vault.sh work
 ```
 
-既存のvaultからコピーすると、そのvaultのノートやworkspace.jsonまで付いてくる。コピー元は常に`docs/`にする。
+`docs/`をコピーして、ローカル固有のworkspace.jsonと.DS_Storeを取り除き、git addまでやる。コミットは自分でする。
+
+既存のvaultからコピーすると、そのvaultのノートやworkspace.jsonまで付いてくる。コピー元は常に`docs/`にする。スクリプトも`docs/`しか見ない。
 
 コピーなので、プラグイン本体672KBと`.obsidian/`と`_templates/`がvaultの数だけ増える。Templaterの設定やOKF.mdを変えたときは、全vaultに手で反映することになる。2つ3つなら問題ないが、増やすほど反映漏れが起きやすくなる。
 
@@ -105,4 +104,21 @@ git merge upstream/main --allow-unrelated-histories
 
 履歴が繋がっていないので、初回だけ--allow-unrelated-historiesが要る。2回目以降は`git fetch upstream`と`git merge upstream/main`だけでいい。
 
-`docs/`をリネームしていないので、テンプレート側の変更はそのままマージされる。ただし反映されるのは`docs/`だけで、コピー済みのvaultには届かない。OKF.mdやプラグイン設定が変わったときは、`docs/`から各vaultへ手で移す。
+`docs/`をリネームしていないので、テンプレート側の変更はそのままマージされる。ただし反映されるのは`docs/`だけで、コピー済みのvaultには届かない。マージのあとにこれを実行する。
+
+```bash
+scripts/sync-vaults.sh
+```
+
+`docs/`と各vaultの`_templates/`と`.obsidian/`を比べて、違うファイルを並べる。中身を見て問題なければ`--apply`を付けて実行すると配られる。ノートとTIMELINE.baseには触らない。
+
+マージ自体はスクリプトにしていない。2回目以降はfetchとmergeの2コマンドで、コンフリクトが出たらどのみち人が読んで決めることになるため。
+
+# スクリプト
+
+`scripts/`に置いてある。
+
+- `new-vault.sh <名前>`。`docs/`をコピーして新しいvaultを作る。
+- `sync-vaults.sh`。`docs/`と各vaultの差分を出す。`--apply`で配る。
+
+名前を覚えていないときはリポジトリのルートで`./run.sh`を叩くと、fzfで一覧から選べる。選んだあとに引数を聞かれるので、そこで渡す。プレビューにスクリプトの先頭が出るので、使い方はそこで確認できる。
